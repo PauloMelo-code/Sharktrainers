@@ -1,0 +1,187 @@
+{
+  "vagas": [
+    {
+      "id": "v1",
+      "cargo": "Vendedores",
+      "cidades": "[\"Tubarão SC\",\"Gravataí RS\"]",
+      "destaques": "[\"Loja rua projeção 200k\",\"Ganhos acima da média\"]",
+      "telefone": "(011) 97839.8648",
+      "descricao": "Rede óptica em expansão busca vendedores com experiência em varejo óptico para lojas de rua com projeção de faturamento de R$ 200 mil/mês.\n\nPerfil consultivo, foco em ticket médio e fidelização. Remuneração fixa + comissão agressiva, benefícios e plano de carreira.",
+      "status": "ativa",
+      "fixada": true,
+      "arte": "/assets/vaga-sample.jpg",
+      "foto": null,
+      "publicada_em": "2026-09-08T15:00:00.000Z"
+    },
+    {
+      "id": "v2",
+      "cargo": "Gerente de Ótica",
+      "cidades": "[\"Itapevi SP\"]",
+      "destaques": "[\"Loja rua projeção 200k\",\"Ganhos acima da média\"]",
+      "telefone": "(011) 97839.8648",
+      "descricao": "Gestão completa de loja de rua com projeção de R$ 200 mil/mês: equipe, indicadores, estoque e relacionamento com laboratório.\n\nExige experiência prévia como gerente no varejo óptico.",
+      "status": "ativa",
+      "fixada": false,
+      "arte": "/assets/vaga-itapevi.jpg",
+      "foto": null,
+      "publicada_em": "2026-09-08T15:00:00.000Z"
+    },
+    {
+      "id": "v3",
+      "cargo": "Vendedores Óticos",
+      "cidades": "[\"Tubarão SC\",\"Araras SP\",\"Gravataí RS\",\"Osasco SP\"]",
+      "destaques": "[\"Vaga CLT + comissões + benefícios\",\"Estamos selecionando os melhores\"]",
+      "telefone": "(011) 97839.8648",
+      "descricao": "Estamos selecionando os melhores para compor mais um projeto de sucesso!\n\nVaga CLT + comissões + benefícios. Agende sua seletiva pelo WhatsApp.",
+      "status": "ativa",
+      "fixada": false,
+      "arte": "/assets/vaga-vendedores-4cidades.jpg",
+      "foto": null,
+      "publicada_em": "2026-08-19T15:00:00.000Z"
+    },
+    {
+      "id": "v4",
+      "cargo": "Pesquisadores / Promotoras",
+      "cidades": "[\"São Paulo SP\"]",
+      "destaques": "[\"Projeto Mulheres 40+\",\"Vaga CLT + comissões + benefícios\"]",
+      "telefone": "(011) 97839.8648",
+      "descricao": "Projeto Nunca é Tarde! Sua chance de se inserir no mercado.\n\nVaga para mulheres 40+, CLT + comissões + benefícios. Agende sua seletiva pelo WhatsApp.",
+      "status": "ativa",
+      "fixada": false,
+      "arte": "/assets/vaga-pesquisadoras.jpg",
+      "foto": null,
+      "publicada_em": "2026-08-19T15:00:00.000Z"
+    },
+    {
+      "id": "v5",
+      "cargo": "Vendedores para Óticas",
+      "cidades": "[\"Tubarão SC\"]",
+      "destaques": "[\"Damos treinamento\",\"Aqui você ganha mais\"]",
+      "telefone": "(011) 97839.8648",
+      "descricao": "Nem reis nem palhaços: trabalhe por você! Aqui você ganha mais.\n\nDamos treinamento. Agende sua seletiva pelo WhatsApp.",
+      "status": "ativa",
+      "fixada": false,
+      "arte": "/assets/vaga-tubarao.jpg",
+      "foto": null,
+      "publicada_em": "2026-08-21T15:00:00.000Z"
+    },
+    {
+      "id": "v6",
+      "cargo": "Vendedores para Óticas",
+      "cidades": "[\"Araras SP\"]",
+      "destaques": "[\"Aqui você ganha mais\",\"Agende sua seletiva\"]",
+      "telefone": "(011) 97839.8648",
+      "descricao": "Nem reis nem palhaços: trabalhe por você! Aqui você ganha mais.\n\nAgende sua seletiva pelo WhatsApp.",
+      "status": "ativa",
+      "fixada": false,
+      "arte": "/assets/vaga-araras.jpg",
+      "foto": null,
+      "publicada_em": "2026-08-21T15:00:00.000Z"
+    },
+    {
+      "id": "v7",
+      "cargo": "Promotores 40+",
+      "cidades": "[\"Osasco SP\"]",
+      "destaques": "[\"Aqui você ganha mais\",\"Agende sua seletiva\"]",
+      "telefone": "(011) 97839.8648",
+      "descricao": "Nem reis nem palhaços: trabalhe por você! Aqui você ganha mais.\n\nVaga para promotores 40+. Agende sua seletiva pelo WhatsApp.",
+      "status": "encerrada",
+      "fixada": false,
+      "arte": "/assets/vaga-osasco.jpg",
+      "foto": null,
+      "publicada_em": "2026-08-21T15:00:00.000Z"
+    },
+    {
+      "id": "v8",
+      "cargo": "Optometrista",
+      "cidades": "[\"Curitiba PR\"]",
+      "destaques": "[\"Consultório equipado\",\"CLT + comissão\"]",
+      "telefone": "(011) 97839.8648",
+      "descricao": "Vaga preenchida em 12 dias pela Shark Trainers.",
+      "status": "encerrada",
+      "fixada": false,
+      "arte": null,
+      "foto": null,
+      "publicada_em": "2026-07-22T15:00:00.000Z"
+    }
+  ],
+  "artigos": [
+    {
+      "id": "a30",
+      "icone": "parceria",
+      "titulo": "Networking no mercado óptico e o impacto da Expo Óptica 2026",
+      "resumo": "Do contato à oportunidade. No 30º artigo, Vanessa explica por que o networking é o ativo invisível que move o setor óptico, um ecossistema fechado onde indústria, laboratórios, distribuidores e varejo dependem de relacionamento.\n\nA Expo Óptica 2026 aparece como termômetro do mercado: entre 10 e 30 novos contatos relevantes e 3 a 5 oportunidades reais de negócio por participante.",
+      "link": "https://www.sindioptica-sp.com.br/coluna-vanessa-30/",
+      "tags": "[\"#networking\",\"#expooptica\",\"#mapeamentodevendas\"]",
+      "categoria": "Mercado",
+      "capa": "/assets/artigo-30.jpg",
+      "status": "publicado",
+      "publicado_em": "2026-03-13T15:00:00.000Z"
+    },
+    {
+      "id": "a34",
+      "icone": "rota",
+      "titulo": "Recalcule a rota da sua ótica para vender mais no 2º semestre",
+      "resumo": "Recalcule a rota e viva as novas estações. O 34º artigo transforma o calendário em ferramenta de vendas: férias de julho, Dia dos Pais, primavera, Dia das Crianças, Black November e o mês de ouro de dezembro, cada um com campanhas e brindes sugeridos.\n\nVanessa também detalha a venda pelos cinco sentidos, da vitrine ao café servido, e lembra: a experiência supera o desconto, sempre.",
+      "link": "https://www.sindioptica-sp.com.br/coluna-vanessa-34/",
+      "tags": "[\"#planejamento\",\"#experienciadocliente\",\"#mapeamentodevendas\"]",
+      "categoria": "Gestão",
+      "capa": "/assets/artigo-34.jpg",
+      "status": "publicado",
+      "publicado_em": "2026-07-01T15:00:00.000Z"
+    },
+    {
+      "id": "a35",
+      "icone": "bussola",
+      "titulo": "Street Marketing: como atrair clientes e aumentar o fluxo na sua óptica",
+      "resumo": "Um cliente guiado jamais perderá o caminho para sua loja. No 35º artigo da coluna, Vanessa mostra como o promotor de rua deixou de ser \"quem distribui panfleto\" e virou o profissional mais estratégico para gerar fluxo e exames visuais.\n\nPerguntas de abordagem que fazem o cliente refletir sobre a própria visão, mapeamento de bairros, parcerias com sindicatos e associações, campanhas sazonais e um roteiro pronto de telemarketing para o Dia dos Pais.",
+      "link": "https://www.sindioptica-sp.com.br/coluna-vanessa-35/",
+      "tags": "[\"#streetmarketing\",\"#fluxodeloja\",\"#mapeamentodevendas\"]",
+      "categoria": "Vendas",
+      "capa": "/assets/artigo-35.jpg",
+      "status": "publicado",
+      "publicado_em": "2026-08-05T15:00:00.000Z"
+    },
+    {
+      "id": "a36",
+      "icone": "chuva",
+      "titulo": "E agora choveu, as vendas encolheram?",
+      "resumo": "Coluna Mapeamento de Vendas, artigo 36. Choveu, o movimento caiu e a equipe já tem a desculpa pronta. Vanessa mostra como transformar um dia vazio em dia de base: recontato de clientes com receita vencendo, revisão de orçamentos em aberto e treino de abordagem.\n\nA leitura fecha com um roteiro de ligações que qualquer vendedor consegue fazer em uma tarde parada.",
+      "link": "https://www.sindioptica-sp.com.br/coluna-vanessa-36/",
+      "tags": "[\"#vendas\",\"#varejooptico\",\"#mapeamentodevendas\"]",
+      "categoria": "Vendas",
+      "capa": "/assets/artigo-sample.jpg",
+      "status": "publicado",
+      "publicado_em": "2026-09-09T15:00:00.000Z"
+    }
+  ],
+  "parceiros": [
+    {
+      "id": "m1",
+      "titulo": "Ivision",
+      "tipo": "Tecnologia · Lentes",
+      "descricao": "Para personalizar lentes corretivas de grau, ofereça ao seu cliente a tecnologia de inteligência artificial do Ivision. A Shark é parceira oficial.",
+      "link": "https://wa.me/5511978398648",
+      "cta": "Mais informações",
+      "ordem": 1
+    },
+    {
+      "id": "m2",
+      "titulo": "Sindióptica-SP",
+      "tipo": "Sindicato · Associação",
+      "descricao": "Esteja por dentro de tudo que acontece no setor: respaldo jurídico, benefícios, indicadores, suporte e cursos de capacitação.",
+      "link": "https://www.sindioptica-sp.com.br",
+      "cta": "Saiba mais",
+      "ordem": 2
+    },
+    {
+      "id": "m4",
+      "titulo": "Abióptica",
+      "tipo": "Associação · Indústria",
+      "descricao": "Principais tendências, indicadores e tecnologias do setor óptico, com suporte para indústrias e redes de franquias do varejo.",
+      "link": "https://www.abioptica.com.br",
+      "cta": "Saiba mais",
+      "ordem": 3
+    }
+  ]
+}

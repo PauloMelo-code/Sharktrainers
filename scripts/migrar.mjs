@@ -1,16 +1,20 @@
 /**
- * Aplica as migrações da pasta drizzle/ no banco apontado por DATABASE_URL e
- * garante que existe um usuário para entrar no painel.
+ * Roda antes do servidor subir (veja o script "start" do package.json) e deixa
+ * o banco pronto:
  *
- * Roda antes do servidor subir (veja o script "start" do package.json), então
- * um deploy novo já nasce com as tabelas criadas. Rodar de novo é inofensivo:
- * aplica só o que falta e não mexe em nada que já existe.
+ *   1. aplica as migrações pendentes da pasta drizzle/;
+ *   2. cria o usuário do painel, se ainda não houver nenhum;
+ *   3. carrega o conteúdo inicial, se o site estiver completamente vazio.
+ *
+ * Nada aqui apaga dados: cada etapa só age quando não encontra nada no lugar.
+ * Rodar de novo é inofensivo.
  *
  *   node scripts/migrar.mjs
  *
  * Só usa dependências de produção: sem drizzle-kit e sem tsx.
  */
 import { randomUUID } from "node:crypto";
+import { readFile } from "node:fs/promises";
 
 import bcrypt from "bcryptjs";
 import { drizzle } from "drizzle-orm/postgres-js";
@@ -48,14 +52,18 @@ async function esperarBanco(cliente) {
   }
 }
 
+const contar = async (cliente, tabela) => {
+  const [{ total }] = await cliente`select count(*)::int as total from ${cliente(tabela)}`;
+  return total;
+};
+
 /**
  * Cria o usuário do painel apenas quando ainda não existe nenhum, para o site
  * novo já nascer com acesso. Nunca troca a senha de um usuário existente:
  * para isso existe o `npm run db:admin`.
  */
 async function garantirUsuario(cliente) {
-  const [{ total }] = await cliente`select count(*)::int as total from usuarios`;
-  if (total > 0) return;
+  if ((await contar(cliente, "usuarios")) > 0) return;
 
   const usuario = (process.env.ADMIN_USER ?? "vanessa").toLowerCase();
   const senha = process.env.ADMIN_PASSWORD;
@@ -75,6 +83,54 @@ async function garantirUsuario(cliente) {
   console.log(`Usuário "${usuario}" criado para o painel.`);
 }
 
+/**
+ * Carga inicial: as vagas, os artigos e os parceiros já aprovados.
+ *
+ * Só entra quando as três tabelas estão vazias ao mesmo tempo, ou seja, num
+ * banco recém-criado. Depois disso o conteúdo é responsabilidade do painel, e
+ * este passo nunca mais mexe em nada — nem se a Vanessa apagar uma vaga.
+ */
+async function carregarConteudoInicial(cliente) {
+  const [vagas, artigos, parceiros] = await Promise.all([
+    contar(cliente, "vagas"),
+    contar(cliente, "artigos"),
+    contar(cliente, "parceiros"),
+  ]);
+
+  if (vagas > 0 || artigos > 0 || parceiros > 0) return;
+
+  const conteudo = JSON.parse(
+    await readFile(new URL("./conteudo-inicial.json", import.meta.url), "utf8"),
+  );
+
+  for (const v of conteudo.vagas) {
+    await cliente`
+      insert into vagas (id, cargo, cidades, destaques, telefone, descricao, status, fixada, arte, foto, publicada_em)
+      values (${v.id}, ${v.cargo}, ${v.cidades}, ${v.destaques}, ${v.telefone}, ${v.descricao},
+              ${v.status}, ${v.fixada}, ${v.arte}, ${v.foto}, ${v.publicada_em}::timestamptz)
+    `;
+  }
+
+  for (const a of conteudo.artigos) {
+    await cliente`
+      insert into artigos (id, icone, titulo, resumo, link, tags, categoria, capa, status, publicado_em)
+      values (${a.id}, ${a.icone}, ${a.titulo}, ${a.resumo}, ${a.link}, ${a.tags},
+              ${a.categoria}, ${a.capa}, ${a.status}, ${a.publicado_em}::timestamptz)
+    `;
+  }
+
+  for (const p of conteudo.parceiros) {
+    await cliente`
+      insert into parceiros (id, titulo, tipo, descricao, link, cta, ordem)
+      values (${p.id}, ${p.titulo}, ${p.tipo}, ${p.descricao}, ${p.link}, ${p.cta}, ${p.ordem})
+    `;
+  }
+
+  console.log(
+    `Conteúdo inicial carregado: ${conteudo.vagas.length} vagas, ${conteudo.artigos.length} artigos e ${conteudo.parceiros.length} parceiros.`,
+  );
+}
+
 // max: 1 porque o migrador precisa de uma conexão só, em sequência.
 const cliente = postgres(url, { max: 1 });
 
@@ -83,8 +139,9 @@ try {
   await migrate(drizzle(cliente), { migrationsFolder: "./drizzle" });
   console.log("Migrações aplicadas.");
   await garantirUsuario(cliente);
+  await carregarConteudoInicial(cliente);
 } catch (erro) {
-  console.error("Falha ao migrar:", erro);
+  console.error("Falha ao preparar o banco:", erro);
   process.exit(1);
 } finally {
   await cliente.end();
