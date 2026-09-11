@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "node --env-file-if-exists=.env scripts/migrar.mjs && next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "db:studio": "drizzle-kit studio",
@@ -14,7 +14,8 @@
     "setup": "npm run db:migrate && npm run db:seed",
     "db:migrate": "node --env-file-if-exists=.env scripts/migrar.mjs",
     "db:generate": "drizzle-kit generate",
-    "db:admin": "node --env-file-if-exists=.env scripts/criar-admin.mjs"
+    "db:admin": "node --env-file-if-exists=.env scripts/criar-admin.mjs",
+    "start:app": "next start"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

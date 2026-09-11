@@ -6,14 +6,12 @@
  *   npm run db:seed -- --sem-demo    só o conteúdo real (use em produção)
  *   npm run db:seed -- --forcar      regrava mesmo com dados já no banco
  *
- * ATENÇÃO: o seed APAGA as tabelas antes de preencher. Para não destruir um
- * site em uso, ele se recusa a rodar quando encontra dados que não vieram
- * dele (currículos, pedidos ou mensagens), a menos que você passe --forcar.
+ * ATENÇÃO: o seed APAGA as tabelas de conteúdo antes de preencher. Para não
+ * destruir um site em uso, ele se recusa a rodar quando encontra dados que não
+ * vieram dele (currículos, pedidos ou mensagens), a menos que você passe
+ * --forcar. O usuário do painel nunca é tocado.
  */
 import "dotenv/config";
-import { randomUUID } from "node:crypto";
-
-import bcrypt from "bcryptjs";
 
 import { db } from "../src/db";
 import {
@@ -23,7 +21,6 @@ import {
   mensagens,
   parceiros,
   pedidosAnuncio,
-  usuarios,
   vagas,
 } from "../src/db/schema";
 
@@ -64,16 +61,9 @@ async function seed() {
   await db.delete(parceiros);
   await db.delete(pedidosAnuncio);
   await db.delete(mensagens);
-  await db.delete(usuarios);
-
-  const usuario = process.env.ADMIN_USER || "vanessa";
-  const senha = process.env.ADMIN_PASSWORD || "shark2026";
-  await db.insert(usuarios).values({
-    id: randomUUID(),
-    usuario,
-    nome: "Vanessa D'Amato",
-    senhaHash: await bcrypt.hash(senha, 12),
-  });
+  // A tabela de usuários fica de fora de propósito: o seed cuida do conteúdo,
+  // não das contas. Quem cria o acesso é scripts/migrar.mjs, na inicialização,
+  // e quem troca a senha é o painel ou `npm run db:admin`.
 
   const vagasSeed = [
     {
@@ -451,7 +441,7 @@ async function seed() {
       ? "Banco populado com o conteúdo real (sem registros de demonstração)."
       : "Banco populado com o conteúdo real e os registros de demonstração.",
   );
-  console.log(`Painel: usuário "${usuario}" / senha "${senha}" (troque depois de entrar).`);
+  console.log("O acesso ao painel não foi alterado.");
 }
 
 seed()

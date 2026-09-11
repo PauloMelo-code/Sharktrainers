@@ -73,9 +73,10 @@ openssl rand -base64 32
 | --- | --- |
 | `npm run dev` | Ambiente de desenvolvimento |
 | `npm run build` | Build de produção |
-| `npm run start` | Sobe o build de produção |
+| `npm run start` | Aplica as migrações e sobe o build de produção |
+| `npm run start:app` | Sobe o build sem passar pelas migrações |
 | `npm run typecheck` | Confere os tipos |
-| `npm run db:migrate` | Aplica as migrações pendentes (seguro, não apaga nada) |
+| `npm run db:migrate` | Aplica as migrações pendentes e cria o acesso ao painel se não houver nenhum (seguro, não apaga nada) |
 | `npm run db:seed` | Repovoa o banco com o conteúdo inicial (**apaga as tabelas antes**) |
 | `npm run db:admin` | Cria ou redefine a senha do usuário do painel |
 | `npm run db:generate` | Cria uma migração nova depois de mexer em `src/db/schema.ts` |
@@ -89,7 +90,8 @@ O `db:migrate` e o `db:admin` rodam só com as dependências de produção, sem
 ## Como está montado
 
 - **Next.js 16** (App Router) com **React 19** e TypeScript.
-- **Drizzle ORM** sobre **PostgreSQL**, com migrações versionadas em `drizzle/`.
+- **Drizzle ORM** sobre **PostgreSQL**, com migrações versionadas em `drizzle/` e
+  aplicadas automaticamente a cada inicialização do servidor.
 - **Server Actions** para todos os formulários, com validação em **Zod** no servidor.
 - **Sessão** em cookie assinado (JWT com `jose`), senha guardada com **bcrypt**. O
   `src/middleware.ts` bloqueia `/painel` e `/api/painel` para quem não está logado.
@@ -111,7 +113,8 @@ src/
 └─ lib/              regras de apoio: datas, listas, sessão, uploads, arte em canvas
 scripts/
 ├─ seed.ts           conteúdo inicial (vagas, artigos, parceiros, demonstração)
-├─ migrar.mjs        aplica as migrações (roda sem dependências de desenvolvimento)
+├─ migrar.mjs        aplica as migrações e garante o acesso ao painel; roda na
+│                    inicialização, sem dependências de desenvolvimento
 └─ criar-admin.mjs   cria ou redefine a senha do usuário do painel
 drizzle/             migrações em SQL, versionadas
 Dockerfile           imagem de produção usada pelo Easypanel
@@ -180,31 +183,30 @@ Trocar essa chave depois derruba quem estiver logado no painel, nada além disso
 
 ### 5. Primeira publicação
 
-Clique em **Deploy** e espere o build. Depois abra a aba **Console** do site e rode, uma
-vez só:
+Clique em **Deploy** e pronto: ao subir, o próprio contêiner cria as tabelas e o usuário
+do painel, usando o `ADMIN_USER` e a `ADMIN_PASSWORD` que você definiu. Nenhum comando
+manual.
+
+O site já abre funcionando, só que sem conteúdo. Para carregar as 8 vagas, os 4 artigos
+e os 3 parceiros que já estavam aprovados, abra a aba **Console** do site e rode, uma vez:
 
 ```bash
-npm run db:migrate                          # cria as tabelas
-npx --yes tsx scripts/seed.ts --sem-demo    # 8 vagas, 4 artigos e 3 parceiros reais
+npx --yes tsx scripts/seed.ts --sem-demo
 ```
 
-Se quiser ver o painel cheio para demonstrar, tire o `--sem-demo`: entram também
-currículos, pedidos e depoimentos de exemplo.
+Se quiser ver o painel cheio para demonstrar ao cliente, tire o `--sem-demo`: entram
+também currículos, pedidos e depoimentos de exemplo.
 
-Entre em `seudominio.com.br/painel` com o usuário e a senha que você definiu, e troque a
-senha em **Minha conta**.
+Entre em `seudominio.com.br/painel` e troque a senha em **Minha conta**.
 
 ### 6. Nos deploys seguintes
 
-Só isso, no Console, depois de cada publicação que mexa no banco:
+Nada a fazer. As migrações pendentes são aplicadas sozinhas a cada inicialização, e
+nunca apagam dados.
 
-```bash
-npm run db:migrate
-```
-
-O comando aplica apenas as migrações que faltam e nunca apaga dados. O `seed` é outra
-coisa: ele limpa as tabelas, e por isso se recusa a rodar quando encontra currículos,
-pedidos ou mensagens já gravados.
+O `seed` é outra coisa e continua manual de propósito: ele limpa as tabelas de conteúdo,
+e por isso se recusa a rodar quando encontra currículos, pedidos ou mensagens já
+gravados. A conta do painel ele nunca toca.
 
 ### Backup
 
