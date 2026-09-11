@@ -132,7 +132,9 @@ async function carregarConteudoInicial(cliente) {
 }
 
 // max: 1 porque o migrador precisa de uma conexão só, em sequência.
-const cliente = postgres(url, { max: 1 });
+// onnotice silencia avisos como "schema drizzle already exists, skipping",
+// normais a partir do segundo deploy: sem eles o log mostra só o que importa.
+const cliente = postgres(url, { max: 1, onnotice: () => {} });
 
 try {
   await esperarBanco(cliente);

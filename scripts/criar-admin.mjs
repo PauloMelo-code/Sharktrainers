@@ -28,7 +28,7 @@ if (!senha || senha.length < 8) {
   process.exit(1);
 }
 
-const sql = postgres(url, { max: 1 });
+const sql = postgres(url, { max: 1, onnotice: () => {} });
 
 try {
   const senhaHash = await bcrypt.hash(senha, 12);
