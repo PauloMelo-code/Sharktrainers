@@ -1,0 +1,23 @@
+node_modules/
+.next/
+out/
+build/
+*.tsbuildinfo
+next-env.d.ts
+
+# variáveis de ambiente
+.env
+.env.local
+.env*.local
+
+# banco de dados local (SQLite)
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# arquivos enviados pelos candidatos (nunca versionar: dados pessoais)
+uploads/
+
+.DS_Store
+*.log
