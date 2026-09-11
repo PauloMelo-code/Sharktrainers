@@ -1,10 +1,14 @@
 /**
- * Popula o banco com o conteúdo real já aprovado no protótipo:
- * as 8 vagas das artes enviadas, os 4 artigos da coluna do Sindióptica-SP,
- * depoimentos, parceiros do Marketplace e alguns registros de exemplo no painel.
+ * Popula o banco com o conteúdo já aprovado: as 8 vagas das artes enviadas,
+ * os 4 artigos da coluna do Sindióptica-SP e os parceiros do Marketplace.
  *
- * Rode com: npm run db:seed
- * É seguro rodar de novo: cada tabela é limpa antes de ser preenchida.
+ *   npm run db:seed                  conteúdo real + registros de demonstração
+ *   npm run db:seed -- --sem-demo    só o conteúdo real (use em produção)
+ *   npm run db:seed -- --forcar      regrava mesmo com dados já no banco
+ *
+ * ATENÇÃO: o seed APAGA as tabelas antes de preencher. Para não destruir um
+ * site em uso, ele se recusa a rodar quando encontra dados que não vieram
+ * dele (currículos, pedidos ou mensagens), a menos que você passe --forcar.
  */
 import "dotenv/config";
 import { randomUUID } from "node:crypto";
@@ -26,7 +30,32 @@ import {
 const data = (iso: string) => new Date(`${iso}T12:00:00-03:00`);
 const lista = (itens: string[]) => JSON.stringify(itens);
 
+const argumentos = process.argv.slice(2);
+const semDemo = argumentos.includes("--sem-demo");
+const forcar = argumentos.includes("--forcar");
+
+/** Impede apagar um site em uso por engano. */
+async function protegerDadosReais() {
+  if (forcar) return;
+
+  const [enviados, pedidos, recados] = await Promise.all([
+    db.select().from(curriculos).limit(1),
+    db.select().from(pedidosAnuncio).limit(1),
+    db.select().from(mensagens).limit(1),
+  ]);
+
+  if (enviados.length || pedidos.length || recados.length) {
+    console.error(
+      "Este banco já tem currículos, pedidos ou mensagens gravados.\n" +
+        "O seed apagaria tudo. Se é mesmo isso que você quer, rode com --forcar.",
+    );
+    process.exit(1);
+  }
+}
+
 async function seed() {
+  await protegerDadosReais();
+
   // Ordem importa: currículos apontam para vagas.
   await db.delete(curriculos);
   await db.delete(vagas);
@@ -202,7 +231,7 @@ async function seed() {
 
   // Depoimentos de demonstração. A Vanessa vai substituir pelos reais do
   // Instagram no painel (Painel → Depoimentos).
-  await db.insert(depoimentos).values([
+  if (!semDemo) await db.insert(depoimentos).values([
     {
       id: "d1",
       tipo: "Candidato recolocado",
@@ -276,7 +305,7 @@ async function seed() {
 
   // Currículos e pedidos de exemplo, só para o painel não abrir vazio.
   // Os arquivos não existem em disco: o painel avisa quando o arquivo sumiu.
-  await db.insert(curriculos).values([
+  if (!semDemo) await db.insert(curriculos).values([
     {
       id: "c1",
       nome: "Mariana Costa",
@@ -362,7 +391,7 @@ async function seed() {
     },
   ]);
 
-  await db.insert(pedidosAnuncio).values([
+  if (!semDemo) await db.insert(pedidosAnuncio).values([
     {
       id: "p1",
       empresa: "Ótica Horizonte",
@@ -400,7 +429,7 @@ async function seed() {
     },
   ]);
 
-  await db.insert(mensagens).values([
+  if (!semDemo) await db.insert(mensagens).values([
     {
       id: "k1",
       nome: "Fernanda Rocha",
@@ -417,7 +446,11 @@ async function seed() {
     },
   ]);
 
-  console.log("Banco populado.");
+  console.log(
+    semDemo
+      ? "Banco populado com o conteúdo real (sem registros de demonstração)."
+      : "Banco populado com o conteúdo real e os registros de demonstração.",
+  );
   console.log(`Painel: usuário "${usuario}" / senha "${senha}" (troque depois de entrar).`);
 }
 

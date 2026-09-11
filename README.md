@@ -70,18 +70,25 @@ openssl rand -base64 32
 | `npm run build` | Build de produção |
 | `npm run start` | Sobe o build de produção |
 | `npm run typecheck` | Confere os tipos |
-| `npm run db:push` | Aplica o schema no banco |
-| `npm run db:seed` | Repovoa o banco com o conteúdo inicial (apaga o que estiver lá) |
+| `npm run db:migrate` | Aplica as migrações pendentes (seguro, não apaga nada) |
+| `npm run db:seed` | Repovoa o banco com o conteúdo inicial (**apaga as tabelas antes**) |
+| `npm run db:push` | Sincroniza o schema direto, sem migração (só em desenvolvimento) |
+| `npm run db:generate` | Cria uma migração nova depois de mexer em `src/db/schema.ts` |
 | `npm run db:studio` | Abre o Drizzle Studio para ver os dados |
+
+O `db:migrate` e o `criar-admin.mjs` rodam só com as dependências de produção, sem
+`drizzle-kit` nem `tsx`. É o que permite publicar sem ferramenta de desenvolvimento no
+servidor.
 
 ---
 
 ## Como está montado
 
 - **Next.js 16** (App Router) com **React 19** e TypeScript.
-- **Drizzle ORM** sobre **SQLite/libSQL**. Em desenvolvimento é um arquivo `dev.db`; em
-  produção pode ser o mesmo arquivo num servidor próprio ou um banco **Turso** (é só
-  trocar a `DATABASE_URL` e informar a `DATABASE_AUTH_TOKEN`).
+- **Drizzle ORM** sobre **SQLite/libSQL**, com migrações versionadas em `drizzle/`. Em
+  desenvolvimento é um arquivo `dev.db`; em produção é o mesmo arquivo dentro de um
+  volume, ou um banco **Turso** (troque a `DATABASE_URL` e informe a
+  `DATABASE_AUTH_TOKEN`).
 - **Server Actions** para todos os formulários, com validação em **Zod** no servidor.
 - **Sessão** em cookie assinado (JWT com `jose`), senha guardada com **bcrypt**. O
   `src/middleware.ts` bloqueia `/painel` e `/api/painel` para quem não está logado.
@@ -101,7 +108,11 @@ src/
 ├─ components/       componentes de tela
 ├─ db/               schema e conexão do Drizzle
 └─ lib/              regras de apoio: datas, listas, sessão, uploads, arte em canvas
-scripts/seed.ts      conteúdo inicial (vagas, artigos, depoimentos, parceiros)
+scripts/
+├─ seed.ts           conteúdo inicial (vagas, artigos, parceiros, demonstração)
+├─ migrar.mjs        aplica as migrações (roda sem dependências de desenvolvimento)
+└─ criar-admin.mjs   cria ou redefine a senha do usuário do painel
+drizzle/             migrações em SQL, versionadas
 public/assets/       logos, fotos, artes das vagas e ícones
 uploads/             currículos enviados (fora do público, nunca versionado)
 ```
@@ -115,28 +126,112 @@ envio, e excluir um currículo no painel apaga também o arquivo do disco.
 
 ---
 
-## Publicando
+## Publicando no Easypanel
 
-O app precisa de um servidor Node (não roda como site estático).
+O app precisa de um servidor Node: não roda como site estático. No Easypanel ele é um
+serviço do tipo **App** — só isso. Não crie serviço de banco: o banco é um arquivo
+SQLite que mora no volume do próprio app.
 
-**Vercel + Turso** (caminho mais simples e com plano gratuito)
+### 1. Criar o serviço
 
-1. Crie um banco no [Turso](https://turso.tech) e copie a URL e o token.
-2. Na Vercel, importe o repositório e defina as variáveis: `DATABASE_URL`,
-   `DATABASE_AUTH_TOKEN`, `SESSION_SECRET`, `ADMIN_USER`, `ADMIN_PASSWORD`.
-3. Rode `npm run db:push` e `npm run db:seed` uma vez apontando para o banco novo.
-4. Atenção: em servidor serverless a pasta `uploads/` não se mantém entre execuções. Para
-   os currículos sobreviverem, troque `src/lib/uploads.ts` por um armazenamento de
-   arquivos (Vercel Blob, S3 ou Cloudflare R2) — é o único ponto do código que grava em
-   disco.
+Projeto → **+ Service** → **App**.
 
-**Servidor próprio ou VPS** (HostGator com Node, Railway, Render)
+| Aba | O que preencher |
+| --- | --- |
+| **Source** | GitHub → `PauloMelo-code/Sharktrainers`, branch `main` |
+| **Build** | **Nixpacks** (detecta o Next.js sozinho; não precisa de Dockerfile) |
+| **Deploy** | Comando de start: `npm run start` |
+| **Domains** | Adicione o domínio e aponte para a porta **3000**, com HTTPS ligado |
 
-1. `npm install && npm run build`
-2. Variáveis de ambiente iguais às de cima, com `DATABASE_URL="file:./dev.db"`.
-3. `npm run start` atrás de um proxy reverso com HTTPS.
-4. Faça backup de `dev.db` e da pasta `uploads/`. Nessa opção os currículos funcionam sem
-   nenhuma mudança no código.
+### 2. Volume (este passo é obrigatório)
+
+Aba **Mounts** → **Add Mount** → **Volume**:
+
+| Campo | Valor |
+| --- | --- |
+| Name | `dados` |
+| Mount Path | `/app/data` |
+
+Sem o volume, **todo deploy apaga o banco e os currículos**, porque o contêiner é
+recriado do zero a cada publicação.
+
+### 3. Variáveis de ambiente
+
+Aba **Environment**:
+
+```
+DATABASE_URL=file:/app/data/dev.db
+UPLOADS_DIR=/app/data/uploads
+SESSION_SECRET=cole-aqui-uma-chave-aleatoria
+ADMIN_USER=vanessa
+ADMIN_PASSWORD=uma-senha-forte-de-verdade
+NODE_ENV=production
+```
+
+Gere a chave de sessão com `openssl rand -base64 32`. Trocar essa chave depois derruba
+quem estiver logado no painel, nada além disso.
+
+### 4. Primeira publicação
+
+Clique em **Deploy** e espere o build terminar. Depois abra a aba **Console** do serviço
+e rode, uma vez só:
+
+```bash
+npm run db:migrate                 # cria as tabelas no volume
+npx --yes tsx scripts/seed.ts --sem-demo   # 8 vagas, 4 artigos e 3 parceiros reais
+```
+
+Se quiser ver o painel cheio para testar, troque `--sem-demo` por nada: aí entram também
+currículos, pedidos e depoimentos de exemplo.
+
+Entre em `seudominio.com.br/painel` com o usuário e a senha que você definiu, e troque a
+senha em **Minha conta**.
+
+### 5. Nos deploys seguintes
+
+Só isso, no Console, depois de cada publicação que mexa no banco:
+
+```bash
+npm run db:migrate
+```
+
+O comando aplica apenas as migrações que faltam e nunca apaga dados. O `seed` é outra
+coisa: ele limpa as tabelas, e por isso se recusa a rodar quando encontra currículos,
+pedidos ou mensagens já gravados.
+
+### Backup
+
+Tudo que importa está em `/app/data` (o arquivo `dev.db` e a pasta `uploads/`). Faça uma
+cópia dessa pasta de tempos em tempos — no Console:
+
+```bash
+tar czf /app/data/backup-$(date +%F).tar.gz /app/data/dev.db /app/data/uploads
+```
+
+Depois baixe o arquivo pelo gerenciador de arquivos do Easypanel e apague o `.tar.gz` do
+volume para não ocupar espaço à toa.
+
+### Esqueceu a senha do painel?
+
+No Console:
+
+```bash
+ADMIN_PASSWORD="nova-senha-forte" node scripts/criar-admin.mjs
+```
+
+---
+
+## Outras hospedagens
+
+**Servidor próprio, VPS ou Docker**: mesmo caminho do Easypanel. Aponte `DATABASE_URL` e
+`UPLOADS_DIR` para uma pasta persistente, rode `npm run build`, `npm run db:migrate` e
+`npm run start` atrás de um proxy com HTTPS.
+
+**Vercel ou outro serverless**: funciona, mas com duas mudanças. O banco precisa ser
+remoto ([Turso](https://turso.tech), com `DATABASE_URL` e `DATABASE_AUTH_TOKEN`), e a
+pasta `uploads/` não sobrevive entre execuções — os currículos precisariam ir para um
+armazenamento de arquivos (Vercel Blob, S3, Cloudflare R2). O único arquivo a mudar
+seria `src/lib/uploads.ts`.
 
 ---
 
