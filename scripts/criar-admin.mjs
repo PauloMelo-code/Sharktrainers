@@ -7,14 +7,19 @@
  *
  *   node scripts/criar-admin.mjs
  */
-import { createClient } from "@libsql/client";
-import bcrypt from "bcryptjs";
 import { randomUUID } from "node:crypto";
 
-const url = process.env.DATABASE_URL ?? "file:./dev.db";
-const authToken = process.env.DATABASE_AUTH_TOKEN;
+import bcrypt from "bcryptjs";
+import postgres from "postgres";
+
+const url = process.env.DATABASE_URL;
 const usuario = (process.env.ADMIN_USER ?? "vanessa").toLowerCase();
 const senha = process.env.ADMIN_PASSWORD;
+
+if (!url) {
+  console.error("DATABASE_URL não definida.");
+  process.exit(1);
+}
 
 if (!senha || senha.length < 8) {
   console.error(
@@ -23,31 +28,25 @@ if (!senha || senha.length < 8) {
   process.exit(1);
 }
 
-const cliente = createClient({ url, authToken });
+const sql = postgres(url, { max: 1 });
 
 try {
   const senhaHash = await bcrypt.hash(senha, 12);
-  const existente = await cliente.execute({
-    sql: "select id from usuarios where usuario = ?",
-    args: [usuario],
-  });
+  const existente = await sql`select id from usuarios where usuario = ${usuario}`;
 
-  if (existente.rows.length > 0) {
-    await cliente.execute({
-      sql: "update usuarios set senha_hash = ? where usuario = ?",
-      args: [senhaHash, usuario],
-    });
+  if (existente.length > 0) {
+    await sql`update usuarios set senha_hash = ${senhaHash} where usuario = ${usuario}`;
     console.log(`Senha do usuário "${usuario}" atualizada.`);
   } else {
-    await cliente.execute({
-      sql: "insert into usuarios (id, usuario, nome, senha_hash, criado_em) values (?, ?, ?, ?, unixepoch())",
-      args: [randomUUID(), usuario, "Vanessa D'Amato", senhaHash],
-    });
+    await sql`
+      insert into usuarios (id, usuario, nome, senha_hash)
+      values (${randomUUID()}, ${usuario}, ${"Vanessa D'Amato"}, ${senhaHash})
+    `;
     console.log(`Usuário "${usuario}" criado.`);
   }
 } catch (erro) {
   console.error("Falha ao criar o usuário do painel:", erro);
   process.exit(1);
 } finally {
-  cliente.close();
+  await sql.end();
 }

@@ -9,19 +9,19 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx scripts/seed.ts",
-    "setup": "drizzle-kit push && tsx scripts/seed.ts",
-    "db:migrate": "node scripts/migrar.mjs",
-    "db:generate": "drizzle-kit generate"
+    "setup": "npm run db:migrate && npm run db:seed",
+    "db:migrate": "node --env-file-if-exists=.env scripts/migrar.mjs",
+    "db:generate": "drizzle-kit generate",
+    "db:admin": "node --env-file-if-exists=.env scripts/criar-admin.mjs"
   },
   "dependencies": {
-    "@libsql/client": "^0.18.0",
     "bcryptjs": "^3.0.2",
     "drizzle-orm": "^0.45.2",
     "jose": "^6.1.0",
     "next": "^16.3.4",
+    "postgres": "^3.4.9",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "zod": "^4.1.12"

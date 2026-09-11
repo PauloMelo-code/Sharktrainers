@@ -1,27 +1,27 @@
 /**
- * Banco da Shark Trainers (Drizzle ORM + SQLite/libSQL).
+ * Banco da Shark Trainers (Drizzle ORM + PostgreSQL).
  *
- * Listas (cidades, destaques, tags) ficam gravadas como texto JSON. Assim o
- * mesmo schema roda em SQLite local, em Turso e, com pouca mudança, em Postgres.
- * Use os helpers `parseLista` / `serializaLista` de src/lib/listas.ts para ler
- * e gravar esses campos — nunca faça JSON.parse solto pelo código.
+ * Listas (cidades, destaques, tags) ficam gravadas como texto JSON, e não como
+ * array nativo do Postgres, para o mesmo schema continuar simples de ler e de
+ * migrar. Use os helpers `parseLista` / `serializaLista` de src/lib/listas.ts
+ * para ler e gravar esses campos — nunca faça JSON.parse solto pelo código.
  */
-import { sql } from "drizzle-orm";
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { boolean, index, integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
-const agora = sql`(unixepoch())`;
+/** Carimbo de data/hora com fuso, do jeito que o Postgres recomenda. */
+const carimbo = (nome: string) => timestamp(nome, { withTimezone: true, mode: "date" });
 
 /** Quem entra no painel interno. */
-export const usuarios = sqliteTable("usuarios", {
+export const usuarios = pgTable("usuarios", {
   id: text("id").primaryKey(),
   usuario: text("usuario").notNull().unique(),
   nome: text("nome").notNull(),
   senhaHash: text("senha_hash").notNull(),
-  criadoEm: integer("criado_em", { mode: "timestamp" }).notNull().default(agora),
+  criadoEm: carimbo("criado_em").notNull().defaultNow(),
 });
 
 /** Vaga do Canal de Empregos. */
-export const vagas = sqliteTable(
+export const vagas = pgTable(
   "vagas",
   {
     id: text("id").primaryKey(),
@@ -35,20 +35,20 @@ export const vagas = sqliteTable(
     /** "ativa" ou "encerrada" */
     status: text("status").notNull().default("ativa"),
     /** Vaga fixada aparece primeiro no feed. */
-    fixada: integer("fixada", { mode: "boolean" }).notNull().default(false),
+    fixada: boolean("fixada").notNull().default(false),
     /** Arte pronta 1080x1600 (caminho em /assets ou /uploads). */
     arte: text("arte"),
     /** Foto de fundo usada pelo gerador de arte. */
     foto: text("foto"),
-    publicadaEm: integer("publicada_em", { mode: "timestamp" }).notNull().default(agora),
-    criadaEm: integer("criada_em", { mode: "timestamp" }).notNull().default(agora),
-    atualizadaEm: integer("atualizada_em", { mode: "timestamp" }).notNull().default(agora),
+    publicadaEm: carimbo("publicada_em").notNull().defaultNow(),
+    criadaEm: carimbo("criada_em").notNull().defaultNow(),
+    atualizadaEm: carimbo("atualizada_em").notNull().defaultNow(),
   },
   (t) => [index("vagas_status_idx").on(t.status, t.publicadaEm)],
 );
 
 /** Artigo do mural (coluna Mapeamento de Vendas). */
-export const artigos = sqliteTable(
+export const artigos = pgTable(
   "artigos",
   {
     id: text("id").primaryKey(),
@@ -63,15 +63,15 @@ export const artigos = sqliteTable(
     capa: text("capa"),
     /** "publicado" ou "rascunho" */
     status: text("status").notNull().default("publicado"),
-    publicadoEm: integer("publicado_em", { mode: "timestamp" }).notNull().default(agora),
-    criadoEm: integer("criado_em", { mode: "timestamp" }).notNull().default(agora),
-    atualizadoEm: integer("atualizado_em", { mode: "timestamp" }).notNull().default(agora),
+    publicadoEm: carimbo("publicado_em").notNull().defaultNow(),
+    criadoEm: carimbo("criado_em").notNull().defaultNow(),
+    atualizadoEm: carimbo("atualizado_em").notNull().defaultNow(),
   },
   (t) => [index("artigos_status_idx").on(t.status, t.publicadoEm)],
 );
 
 /** Depoimento exibido na Home e na página de Depoimentos. */
-export const depoimentos = sqliteTable(
+export const depoimentos = pgTable(
   "depoimentos",
   {
     id: text("id").primaryKey(),
@@ -80,13 +80,13 @@ export const depoimentos = sqliteTable(
     cargo: text("cargo").notNull().default(""),
     texto: text("texto").notNull(),
     ordem: integer("ordem").notNull().default(0),
-    criadoEm: integer("criado_em", { mode: "timestamp" }).notNull().default(agora),
+    criadoEm: carimbo("criado_em").notNull().defaultNow(),
   },
   (t) => [index("depoimentos_ordem_idx").on(t.ordem)],
 );
 
 /** Empresa parceira do Marketplace. */
-export const parceiros = sqliteTable(
+export const parceiros = pgTable(
   "parceiros",
   {
     id: text("id").primaryKey(),
@@ -96,7 +96,7 @@ export const parceiros = sqliteTable(
     link: text("link").notNull().default(""),
     cta: text("cta").notNull().default("Saiba mais"),
     ordem: integer("ordem").notNull().default(0),
-    criadoEm: integer("criado_em", { mode: "timestamp" }).notNull().default(agora),
+    criadoEm: carimbo("criado_em").notNull().defaultNow(),
   },
   (t) => [index("parceiros_ordem_idx").on(t.ordem)],
 );
@@ -106,7 +106,7 @@ export const parceiros = sqliteTable(
  * Contém dados pessoais: o arquivo fica fora da pasta pública e só é servido
  * para quem está logado no painel.
  */
-export const curriculos = sqliteTable(
+export const curriculos = pgTable(
   "curriculos",
   {
     id: text("id").primaryKey(),
@@ -127,14 +127,14 @@ export const curriculos = sqliteTable(
     status: text("status").notNull().default("novo"),
     obs: text("obs").notNull().default(""),
     vagaId: text("vaga_id").references(() => vagas.id, { onDelete: "set null" }),
-    criadoEm: integer("criado_em", { mode: "timestamp" }).notNull().default(agora),
-    atualizadoEm: integer("atualizado_em", { mode: "timestamp" }).notNull().default(agora),
+    criadoEm: carimbo("criado_em").notNull().defaultNow(),
+    atualizadoEm: carimbo("atualizado_em").notNull().defaultNow(),
   },
   (t) => [index("curriculos_status_idx").on(t.status, t.criadoEm)],
 );
 
 /** Pedido enviado pelo formulário "Anuncie Aqui". */
-export const pedidosAnuncio = sqliteTable(
+export const pedidosAnuncio = pgTable(
   "pedidos_anuncio",
   {
     id: text("id").primaryKey(),
@@ -148,22 +148,22 @@ export const pedidosAnuncio = sqliteTable(
     /** "pendente", "em contato", "publicado" ou "recusado" */
     status: text("status").notNull().default("pendente"),
     obs: text("obs").notNull().default(""),
-    criadoEm: integer("criado_em", { mode: "timestamp" }).notNull().default(agora),
-    atualizadoEm: integer("atualizado_em", { mode: "timestamp" }).notNull().default(agora),
+    criadoEm: carimbo("criado_em").notNull().defaultNow(),
+    atualizadoEm: carimbo("atualizado_em").notNull().defaultNow(),
   },
   (t) => [index("pedidos_status_idx").on(t.status, t.criadoEm)],
 );
 
 /** Mensagem enviada pelo formulário de Contato. */
-export const mensagens = sqliteTable(
+export const mensagens = pgTable(
   "mensagens",
   {
     id: text("id").primaryKey(),
     nome: text("nome").notNull(),
     contato: text("contato").notNull(),
     mensagem: text("mensagem").notNull(),
-    lida: integer("lida", { mode: "boolean" }).notNull().default(false),
-    criadoEm: integer("criado_em", { mode: "timestamp" }).notNull().default(agora),
+    lida: boolean("lida").notNull().default(false),
+    criadoEm: carimbo("criado_em").notNull().defaultNow(),
   },
   (t) => [index("mensagens_criado_idx").on(t.criadoEm)],
 );
