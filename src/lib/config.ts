@@ -58,12 +58,20 @@ export const ICONES_ARTIGO = [
   { valor: "grafico", rotulo: "Indicadores" },
 ] as const;
 
-/** Logos da faixa "Clientes em todo o Brasil" (altura ajustada por logo). */
+/**
+ * Logos da faixa "Clientes em todo o Brasil".
+ *
+ * Só entram aqui empresas que contrataram a Shark. Instituições e associações
+ * parceiras (Abióptica, Senac) ficam no Marketplace, não nesta faixa.
+ *
+ * Para incluir um cliente novo: coloque o PNG em `public/assets/clientes/` (fundo
+ * transparente) e acrescente uma linha abaixo. A `altura` é ajustada logo a logo
+ * porque cada arquivo tem uma proporção diferente — o objetivo é que todos
+ * pareçam do mesmo tamanho na tela, não que tenham o mesmo número.
+ */
 export const CLIENTES = [
   { nome: "Óticas Carol", arquivo: "oticas-carol", altura: "26px" },
   { nome: "Chilli Beans", arquivo: "chilli-beans", altura: "56px" },
   { nome: "Mercadão dos Óculos", arquivo: "mercadao", altura: "62px" },
-  { nome: "Senac", arquivo: "senac", altura: "50px" },
   { nome: "CNA", arquivo: "cna", altura: "34px" },
-  { nome: "Abióptica", arquivo: "abioptica", altura: "52px" },
 ] as const;

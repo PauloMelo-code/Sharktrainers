@@ -189,7 +189,7 @@ Clique em **Deploy** e pronto. Ao subir, o contêiner deixa o banco pronto sozin
 
 1. cria as tabelas;
 2. cria o usuário do painel, com o `ADMIN_USER` e a `ADMIN_PASSWORD` que você definiu;
-3. carrega o conteúdo aprovado (8 vagas, 4 artigos e 3 parceiros), **se o site estiver
+3. carrega o conteúdo aprovado (8 vagas, 4 artigos e 4 parceiros), **se o site estiver
    completamente vazio**.
 
 Nenhum comando manual. O passo 3 só acontece num banco recém-criado: depois disso o
