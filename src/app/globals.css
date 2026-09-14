@@ -889,19 +889,50 @@ textarea.entrada {
   margin: 0;
 }
 
+/* Parede de clientes: quadros iguais, para os logos com fundo colorido e os
+   logos escritos conviverem sem um parecer maior que o outro. A largura
+   máxima faz a fila quebrar equilibrada em vez de deixar uma linha quase
+   vazia no fim. */
 .logos-clientes {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
   justify-content: center;
-  gap: 22px 44px;
+  gap: 14px;
+  max-width: 760px;
 }
 
 .logos-clientes img {
-  width: auto;
-  max-width: 180px;
-  object-fit: contain;
+  width: 92px;
+  height: 92px;
   display: block;
+  background: var(--branco);
+  border: 1px solid var(--borda);
+}
+
+/* Foto de perfil quadrada: ocupa o quadro inteiro, com o fundo que ela tiver. */
+.logos-clientes .logo-selo {
+  object-fit: cover;
+}
+
+/* Logo escrito na horizontal: centralizado, com folga para respirar. */
+.logos-clientes .logo-marca {
+  object-fit: contain;
+  padding: 14px;
+}
+
+@media (max-width: 520px) {
+  .logos-clientes {
+    gap: 10px;
+  }
+
+  .logos-clientes img {
+    width: 78px;
+    height: 78px;
+  }
+
+  .logos-clientes .logo-marca {
+    padding: 10px;
+  }
 }
 
 .grade-passos {

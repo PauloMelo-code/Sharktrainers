@@ -58,10 +58,11 @@ export default async function Home() {
             {CLIENTES.map((cliente) => (
               <img
                 key={cliente.arquivo}
-                src={`/assets/clientes/${cliente.arquivo}.png`}
+                className={`logo-${cliente.formato}`}
+                src={`/assets/clientes/${cliente.arquivo}`}
                 alt={cliente.nome}
                 title={cliente.nome}
-                style={{ height: cliente.altura }}
+                loading="lazy"
               />
             ))}
           </div>

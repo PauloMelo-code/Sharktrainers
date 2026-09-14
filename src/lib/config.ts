@@ -64,14 +64,29 @@ export const ICONES_ARTIGO = [
  * Só entram aqui empresas que contrataram a Shark. Instituições e associações
  * parceiras (Abióptica, Senac) ficam no Marketplace, não nesta faixa.
  *
- * Para incluir um cliente novo: coloque o PNG em `public/assets/clientes/` (fundo
- * transparente) e acrescente uma linha abaixo. A `altura` é ajustada logo a logo
- * porque cada arquivo tem uma proporção diferente — o objetivo é que todos
- * pareçam do mesmo tamanho na tela, não que tenham o mesmo número.
+ * Todos aparecem em quadros do mesmo tamanho, e o `formato` diz como a imagem
+ * se encaixa no quadro:
+ *
+ *   "selo"  — imagem quadrada, como foto de perfil. Preenche o quadro inteiro,
+ *             inclusive o fundo colorido, se tiver.
+ *   "marca" — logo escrito na horizontal, com fundo transparente. Fica
+ *             centralizado no quadro, com uma folga em volta.
+ *
+ * Para incluir um cliente novo: coloque o arquivo em `public/assets/clientes/`
+ * e acrescente uma linha abaixo com o nome do arquivo e o formato.
  */
 export const CLIENTES = [
-  { nome: "Óticas Carol", arquivo: "oticas-carol", altura: "26px" },
-  { nome: "Chilli Beans", arquivo: "chilli-beans", altura: "56px" },
-  { nome: "Mercadão dos Óculos", arquivo: "mercadao", altura: "62px" },
-  { nome: "CNA", arquivo: "cna", altura: "34px" },
+  { nome: "Óticas Carol", arquivo: "oticas-carol.jpg", formato: "selo" },
+  { nome: "Chilli Beans", arquivo: "chilli-beans.png", formato: "marca" },
+  { nome: "Mercadão dos Óculos", arquivo: "mercadao.png", formato: "marca" },
+  { nome: "CNA", arquivo: "cna.jpg", formato: "selo" },
+  { nome: "Ótica Visão d'Todos", arquivo: "visao-dtodos.jpg", formato: "selo" },
+  { nome: "Óculos Mania", arquivo: "oculos-mania.jpg", formato: "selo" },
+  { nome: "Óticas Portal", arquivo: "oticas-portal.jpg", formato: "selo" },
+  { nome: "ARIA Ótica", arquivo: "aria.jpg", formato: "selo" },
+  { nome: "Óticas Ferri", arquivo: "oticas-ferri.jpg", formato: "selo" },
+  { nome: "QOculos", arquivo: "qoculos.jpg", formato: "selo" },
+  { nome: "Oculum Ótica", arquivo: "oculum.jpg", formato: "selo" },
+  { nome: "Coifeodonto", arquivo: "coifeodonto.jpg", formato: "selo" },
+  { nome: "Ortho Pride", arquivo: "ortho-pride.jpg", formato: "selo" },
 ] as const;
