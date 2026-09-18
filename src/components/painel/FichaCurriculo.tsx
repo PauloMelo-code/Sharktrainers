@@ -16,7 +16,7 @@ export type CurriculoFicha = {
   salario: string;
   linkedin: string;
   mensagem: string;
-  arquivoNome: string;
+  arquivoNome: string | null;
   status: string;
   obs: string;
   dataLabel: string;
@@ -107,17 +107,20 @@ export function FichaCurriculo({ curriculo }: { curriculo: CurriculoFicha }) {
         {curriculo.mensagem || "—"}
       </p>
 
-      <a
-        href={`/api/painel/curriculos/${curriculo.id}/arquivo`}
-        className="ficha-arquivo"
-        download
-      >
-        <span className="nome">
-          <img src="/assets/icons/documento.svg" alt="" />
-          {curriculo.arquivoNome}
-        </span>
-        <span className="baixar">Baixar</span>
-      </a>
+      {/* Só os cadastros anteriores à retirada do anexo têm arquivo. */}
+      {curriculo.arquivoNome && (
+        <a
+          href={`/api/painel/curriculos/${curriculo.id}/arquivo`}
+          className="ficha-arquivo"
+          download
+        >
+          <span className="nome">
+            <img src="/assets/icons/documento.svg" alt="" />
+            {curriculo.arquivoNome}
+          </span>
+          <span className="baixar">Baixar</span>
+        </a>
+      )}
 
       <label className="rotulo-campo" htmlFor="ficha-status">
         Status
@@ -161,7 +164,7 @@ export function FichaCurriculo({ curriculo }: { curriculo: CurriculoFicha }) {
       <form action={excluirCurriculo} style={{ marginTop: 18 }}>
         <input type="hidden" name="id" value={curriculo.id} />
         <button type="submit" className="botao-painel botao-painel-perigo">
-          Excluir currículo e arquivo
+          {curriculo.arquivoNome ? "Excluir cadastro e arquivo" : "Excluir cadastro"}
         </button>
       </form>
     </div>

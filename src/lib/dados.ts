@@ -168,7 +168,11 @@ export const PASSOS = [
     numero: "3",
     titulo: "Apresentação e garantia",
     descricao:
-      "Você recebe poucos candidatos, todos no perfil. Se não der certo, refazemos a busca.",
+      "Após a triagem dos currículos e a realização das avaliações técnicas, enviamos o " +
+      "candidato ideal apenas para o seu veredito final. Caso o profissional contratado " +
+      "não se adapte à cultura ou às funções da empresa durante o primeiro mês de " +
+      "onboarding (integração), por falha de desempenho ou perfil, realizamos a reposição " +
+      "do candidato com custo zero para o seu negócio.",
   },
 ];
 

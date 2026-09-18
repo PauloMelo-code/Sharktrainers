@@ -119,10 +119,15 @@ export const curriculos = pgTable(
     salario: text("salario").notNull().default(""),
     linkedin: text("linkedin").notNull().default(""),
     mensagem: text("mensagem").notNull().default(""),
-    arquivoNome: text("arquivo_nome").notNull(),
+    /**
+     * Arquivo do currículo. Vazio nos cadastros novos: o formulário deixou de
+     * pedir o anexo, e a conversa segue pelo WhatsApp. As colunas ficam porque
+     * os currículos enviados antes disso continuam disponíveis no painel.
+     */
+    arquivoNome: text("arquivo_nome"),
     /** Nome do arquivo dentro de UPLOADS_DIR. */
-    arquivoPath: text("arquivo_path").notNull(),
-    arquivoTipo: text("arquivo_tipo").notNull().default("application/octet-stream"),
+    arquivoPath: text("arquivo_path"),
+    arquivoTipo: text("arquivo_tipo"),
     /** "novo", "em análise", "contatado" ou "arquivado" */
     status: text("status").notNull().default("novo"),
     obs: text("obs").notNull().default(""),

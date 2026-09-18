@@ -14,7 +14,6 @@ type Props = {
 
 export function FormularioCurriculo({ vagaId, cargoSugerido }: Props) {
   const [estado, acao, enviando] = useActionState(enviarCurriculo, ESTADO_INICIAL);
-  const [nomeArquivo, setNomeArquivo] = useState("");
   const [chaveForm, setChaveForm] = useState(0);
 
   const valor = (campo: string, padrao = "") => estado.valores[campo] ?? padrao;
@@ -41,7 +40,6 @@ export function FormularioCurriculo({ vagaId, cargoSugerido }: Props) {
               type="button"
               className="btn btn-contorno btn-pequeno"
               onClick={() => {
-                setNomeArquivo("");
                 setChaveForm((valorAtual) => valorAtual + 1);
                 window.location.reload();
               }}
@@ -190,21 +188,6 @@ export function FormularioCurriculo({ vagaId, cargoSugerido }: Props) {
         </div>
 
         <div className="campo campo-largo">
-          <span className="rotulo-campo">Currículo (PDF ou DOC) *</span>
-          <label className="arquivo">
-            <span className="arquivo-nome">{nomeArquivo || "Nenhum arquivo selecionado"}</span>
-            <span className="arquivo-botao">Escolher arquivo</span>
-            <input
-              type="file"
-              name="arquivo"
-              accept=".pdf,.doc,.docx"
-              onChange={(evento) => setNomeArquivo(evento.target.files?.[0]?.name ?? "")}
-            />
-          </label>
-          <div className="erro-campo">{erro("arquivo")}</div>
-        </div>
-
-        <div className="campo campo-largo">
           <label className="rotulo-campo" htmlFor="cv-mensagem">
             Mensagem
           </label>
@@ -221,7 +204,7 @@ export function FormularioCurriculo({ vagaId, cargoSugerido }: Props) {
 
       <label className="aceite">
         <input type="checkbox" name="lgpd" defaultChecked={valor("lgpd") === "on"} />
-        Autorizo a Shark Trainers a armazenar meu currículo e apresentá-lo a empresas do setor
+        Autorizo a Shark Trainers a armazenar os meus dados e apresentá-los a empresas do setor
         óptico, conforme a LGPD.
       </label>
       <div className="erro-campo">{erro("lgpd")}</div>

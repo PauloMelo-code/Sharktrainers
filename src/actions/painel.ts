@@ -271,7 +271,9 @@ export async function excluirCurriculo(dados: FormData) {
   const id = textoDe(dados, "id");
 
   const [registro] = await db.select().from(curriculos).where(eq(curriculos.id, id)).limit(1);
-  if (registro) await apagarArquivo(registro.arquivoPath);
+  // Cadastros feitos depois que o formulário deixou de pedir o anexo não têm
+  // arquivo em disco para apagar.
+  if (registro?.arquivoPath) await apagarArquivo(registro.arquivoPath);
 
   await db.delete(curriculos).where(eq(curriculos.id, id));
   revalidatePath("/painel/curriculos");

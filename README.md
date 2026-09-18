@@ -17,7 +17,7 @@ receber currículos, pedidos de anúncio e mensagens.
 | `/empregos` | Feed de vagas com filtro por cargo, estado e ordem (o filtro fica na URL, então dá para compartilhar) |
 | `/vaga/[id]` | Página da vaga: arte, destaques, descrição, candidatura pelo WhatsApp e compartilhamento |
 | `/anuncie` | Formulário "Anuncie Aqui" para óticas pedirem a publicação de uma vaga |
-| `/curriculo` | Cadastro no banco de talentos, com upload do currículo em PDF ou DOC |
+| `/curriculo` | Cadastro no banco de talentos: ficha do candidato, sem anexo de arquivo |
 | `/contato` | Canais de contato e formulário de mensagem |
 | `/artigos` e `/artigo/[id]` | Mural da coluna Mapeamento de Vendas |
 | `/depoimentos` | Depoimentos de candidatos e empresas |
@@ -34,8 +34,9 @@ receber currículos, pedidos de anúncio e mensagens.
 - **Artigos**: cole o post do Instagram e o sistema separa título, resumo, link e
   hashtags. Ícone próprio por artigo (o site não usa emoji), capa opcional, rascunho ou
   publicado.
-- **Currículos**: lista com filtros, ficha completa, download do arquivo, status
-  (novo, em análise, contatado, arquivado) e observações internas.
+- **Currículos**: lista com filtros, ficha completa, status (novo, em análise, contatado,
+  arquivado) e observações internas. Nos cadastros antigos, feitos quando o formulário
+  ainda pedia anexo, o botão de download continua na ficha.
 - **Pedidos de anúncio**, **Depoimentos**, **Marketplace** e **Contatos**.
 - **Minha conta**: troca de senha.
 
@@ -128,10 +129,14 @@ uploads/             currículos enviados (fora do público, nunca versionado)
 
 ### Onde ficam os dados pessoais
 
-Os currículos **não** ficam na pasta pública. O arquivo é gravado em `uploads/` com um
-nome aleatório e só sai pela rota `/api/painel/curriculos/[id]/arquivo`, que exige sessão
-do painel. A pasta está no `.gitignore`. Os formulários pedem consentimento LGPD antes do
-envio, e excluir um currículo no painel apaga também o arquivo do disco.
+O formulário público **não recebe mais anexo de currículo**: o candidato preenche a ficha
+e a conversa segue pelo WhatsApp. Menos dado pessoal guardado, menos risco.
+
+Os currículos enviados antes dessa mudança continuam no painel, com download. Esses
+arquivos **não** ficam na pasta pública: estão em `uploads/`, com nome aleatório, e só
+saem pela rota `/api/painel/curriculos/[id]/arquivo`, que exige sessão do painel. A pasta
+está no `.gitignore`. Os formulários pedem consentimento LGPD antes do envio, e excluir um
+currículo no painel apaga também o arquivo do disco, quando existe.
 
 ---
 
@@ -154,19 +159,19 @@ Projeto → **+ Service** → **App**.
 | **Build** | **Dockerfile** (o repositório já tem um) ou **Nixpacks** — os dois funcionam |
 | **Domains** | Seu domínio apontando para a porta **3000**, com HTTPS ligado |
 
-### 3. Volume para os currículos
+### 3. Volume para os arquivos de currículo antigos
 
-O banco fica no Postgres, mas os arquivos de currículo são gravados em disco. Aba
-**Mounts** → **Add Mount** → **Volume**:
+O formulário não recebe mais anexo, então nada novo é gravado em disco. Mas os currículos
+enviados antes dessa mudança são arquivos, e some a cada publicação o que não estiver num
+volume, porque o contêiner é recriado do zero. Se o site já recebeu currículos com anexo,
+mantenha o volume. Aba **Mounts** → **Add Mount** → **Volume**:
 
 | Campo | Valor |
 | --- | --- |
 | Name | `dados` |
 | Mount Path | `/app/data` |
 
-Sem o volume, **os currículos enviados somem a cada publicação**, porque o contêiner é
-recriado do zero. Os dados do painel (vagas, artigos, candidatos) não correm esse risco:
-estão no Postgres.
+Os dados do painel (vagas, artigos, candidatos) não correm esse risco: estão no Postgres.
 
 ### 4. Variáveis de ambiente
 

@@ -8,7 +8,6 @@ import { z } from "zod";
 import type { EstadoFormulario } from "@/actions/estado";
 import { db } from "@/db";
 import { curriculos, mensagens, pedidosAnuncio } from "@/db/schema";
-import { salvarCurriculo, validarCurriculo } from "@/lib/uploads";
 
 const OBRIGATORIO = "Campo obrigatório";
 const FALHA_ENVIO =
@@ -57,20 +56,18 @@ export async function enviarCurriculo(
 ): Promise<EstadoFormulario> {
   const valores = valoresDoForm(dados);
   const resultado = esquemaCurriculo.safeParse(Object.fromEntries(dados.entries()));
-  const arquivo = dados.get("arquivo");
-  const erroArquivo = validarCurriculo(arquivo instanceof File ? arquivo : null);
 
-  const erros = resultado.success ? {} : errosDoZod(resultado.error);
-  if (erroArquivo) erros.arquivo = erroArquivo;
-
-  if (!resultado.success || erroArquivo) {
-    return { ok: false, erros, valores };
+  if (!resultado.success) {
+    return { ok: false, erros: errosDoZod(resultado.error), valores };
   }
 
   const dadosValidos = resultado.data;
 
   try {
-    const salvo = await salvarCurriculo(arquivo as File);
+    // O formulário não pede mais o arquivo do currículo: o candidato preenche
+    // a ficha e a conversa segue pelo WhatsApp. As colunas de arquivo
+    // continuam no banco, sem preenchimento, porque os currículos enviados
+    // antes desta mudança seguem disponíveis para download no painel.
     await db.insert(curriculos).values({
       id: randomUUID(),
       nome: dadosValidos.nome,
@@ -83,7 +80,6 @@ export async function enviarCurriculo(
       linkedin: dadosValidos.linkedin ?? "",
       mensagem: dadosValidos.mensagem ?? "",
       vagaId: dadosValidos.vagaId || null,
-      ...salvo,
     });
   } catch (erro) {
     console.error("Falha ao gravar currículo", erro);

@@ -25,6 +25,15 @@ export async function GET(
     return NextResponse.json({ erro: "Currículo não encontrado" }, { status: 404 });
   }
 
+  // Cadastros feitos depois que o formulário deixou de pedir o anexo não têm
+  // arquivo nenhum para entregar.
+  if (!registro.arquivoPath) {
+    return NextResponse.json(
+      { erro: "Este cadastro foi feito sem anexo de currículo." },
+      { status: 404 },
+    );
+  }
+
   const conteudo = await lerArquivo(registro.arquivoPath);
   if (!conteudo) {
     return NextResponse.json(
@@ -35,8 +44,8 @@ export async function GET(
 
   return new NextResponse(new Uint8Array(conteudo), {
     headers: {
-      "Content-Type": registro.arquivoTipo,
-      "Content-Disposition": `attachment; filename="${encodeURIComponent(registro.arquivoNome)}"`,
+      "Content-Type": registro.arquivoTipo ?? "application/octet-stream",
+      "Content-Disposition": `attachment; filename="${encodeURIComponent(registro.arquivoNome ?? "curriculo")}"`,
       "Cache-Control": "private, no-store",
     },
   });

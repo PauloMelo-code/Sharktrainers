@@ -86,7 +86,7 @@ export default async function VagaPage({ params }: Props) {
                 Quero me candidatar
               </a>
               <Link href={`/curriculo?vaga=${vaga.id}`} className="btn btn-secundario">
-                Enviar meu currículo
+                Cadastrar meu currículo
               </Link>
             </div>
           ) : (
