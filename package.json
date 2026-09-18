@@ -14,6 +14,7 @@
     "setup": "npm run db:migrate && npm run db:seed",
     "db:migrate": "node --env-file-if-exists=.env scripts/migrar.mjs",
     "db:generate": "drizzle-kit generate",
+    "db:publicar": "node --env-file-if-exists=.env scripts/publicar-conteudo.mjs",
     "db:admin": "node --env-file-if-exists=.env scripts/criar-admin.mjs",
     "start:app": "next start"
   },

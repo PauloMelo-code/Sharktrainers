@@ -103,6 +103,45 @@
       "arte": null,
       "foto": null,
       "publicada_em": "2026-07-22T15:00:00.000Z"
+    },
+    {
+      "id": "v9",
+      "cargo": "Consultores",
+      "cidades": "[\"Araras SP\",\"Tubarão SC\",\"Gravataí RS\",\"Indaiatuba SP\"]",
+      "destaques": "[\"Grandes redes e franquias\",\"Para quem quer evoluir e crescer\"]",
+      "telefone": "(011) 97839.8648",
+      "descricao": "Vagas para óticas de grandes redes e franquias.\n\nO mundo é das pessoas agoniadas, desenroladas, corajosas e determinadas a mudar, sair da zona de conforto, evoluir e crescer!\n\nAgende sua seletiva pelo WhatsApp.",
+      "status": "ativa",
+      "fixada": false,
+      "arte": "/assets/vaga-grandes-redes.jpg",
+      "foto": null,
+      "publicada_em": "2026-09-18T15:00:00.000Z"
+    },
+    {
+      "id": "v10",
+      "cargo": "Divulgadores",
+      "cidades": "[\"Osasco SP\"]",
+      "destaques": "[\"Grandes redes e franquias\",\"Para quem quer evoluir e crescer\"]",
+      "telefone": "(011) 97839.8648",
+      "descricao": "Vagas para óticas de grandes redes e franquias.\n\nO mundo é das pessoas agoniadas, desenroladas, corajosas e determinadas a mudar, sair da zona de conforto, evoluir e crescer!\n\nAgende sua seletiva pelo WhatsApp.",
+      "status": "ativa",
+      "fixada": false,
+      "arte": "/assets/vaga-grandes-redes.jpg",
+      "foto": null,
+      "publicada_em": "2026-09-18T15:00:00.000Z"
+    },
+    {
+      "id": "v11",
+      "cargo": "Gestor",
+      "cidades": "[\"Itapevi SP\"]",
+      "destaques": "[\"Grandes redes e franquias\",\"Para quem quer evoluir e crescer\"]",
+      "telefone": "(011) 97839.8648",
+      "descricao": "Vagas para óticas de grandes redes e franquias.\n\nO mundo é das pessoas agoniadas, desenroladas, corajosas e determinadas a mudar, sair da zona de conforto, evoluir e crescer!\n\nAgende sua seletiva pelo WhatsApp.",
+      "status": "ativa",
+      "fixada": false,
+      "arte": "/assets/vaga-grandes-redes.jpg",
+      "foto": null,
+      "publicada_em": "2026-09-18T15:00:00.000Z"
     }
   ],
   "artigos": [

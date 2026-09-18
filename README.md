@@ -77,6 +77,7 @@ openssl rand -base64 32
 | `npm run start:app` | Sobe o build sem passar pelas migrações |
 | `npm run typecheck` | Confere os tipos |
 | `npm run db:migrate` | Prepara o banco: migrações, acesso ao painel e conteúdo inicial, tudo só quando falta (seguro, não apaga nada) |
+| `npm run db:publicar` | Publica num site já no ar o conteúdo novo de `scripts/conteudo-inicial.json` (só insere o que falta; `-- --simular` mostra antes) |
 | `npm run db:seed` | Repovoa o banco com o conteúdo inicial (**apaga as tabelas antes**) |
 | `npm run db:admin` | Cria ou redefine a senha do usuário do painel |
 | `npm run db:generate` | Cria uma migração nova depois de mexer em `src/db/schema.ts` |
@@ -117,6 +118,7 @@ scripts/
 ├─ migrar.mjs        prepara o banco na inicialização (migrações, acesso e carga
 │                    inicial), sem dependências de desenvolvimento
 ├─ conteudo-inicial.json   vagas, artigos e parceiros aprovados
+├─ publicar-conteudo.mjs   publica num site no ar só o que ainda falta
 └─ criar-admin.mjs   cria ou redefine a senha do usuário do painel
 drizzle/             migrações em SQL, versionadas
 Dockerfile           imagem de produção usada pelo Easypanel
@@ -213,6 +215,22 @@ nunca apagam dados.
 O `seed` é outra coisa e continua manual de propósito: ele limpa as tabelas de conteúdo,
 e por isso se recusa a rodar quando encontra currículos, pedidos ou mensagens já
 gravados. A conta do painel ele nunca toca.
+
+### Publicando conteúdo novo sem passar pelo painel
+
+O caminho normal para uma vaga ou um artigo novo é o painel. Quando não dá (o painel
+fora do ar, um lote grande de uma vez), acrescente os itens em
+`scripts/conteudo-inicial.json`, publique o repositório e rode no **Console**:
+
+```bash
+npm run db:publicar -- --simular    # mostra o que seria publicado
+npm run db:publicar                 # publica
+```
+
+Ele compara pelo id e **só insere o que ainda não está no banco**. Nunca altera nem
+apaga o que já existe, e rodar de novo sem novidade no arquivo não faz nada. É manual
+de propósito: se rodasse sozinho a cada publicação, traria de volta uma vaga que a
+Vanessa tivesse apagado pelo painel.
 
 ### Backup
 
