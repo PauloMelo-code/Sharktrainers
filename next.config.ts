@@ -9,6 +9,12 @@ const nextConfig: NextConfig = {
   experimental: {
     serverActions: { bodySizeLimit: "12mb" },
   },
+
+  // Imagens enviadas antes da mudança ficaram gravadas no banco como
+  // /uploads/arquivo. Hoje quem entrega é a rota /imagens.
+  async rewrites() {
+    return [{ source: "/uploads/:arquivo", destination: "/imagens/:arquivo" }];
+  },
 };
 
 export default nextConfig;

@@ -41,17 +41,54 @@ export async function apagarArquivo(arquivoPath: string) {
   }
 }
 
-/** Salva uma imagem (foto de vaga ou capa de artigo) em public/uploads. */
+/**
+ * Fotos de vaga e capas de artigo. Ficam no volume, numa subpasta separada
+ * dos currículos, e saem pela rota pública /imagens/[arquivo].
+ *
+ * Não podem ir para public/: em produção o Next só entrega o que já estava lá
+ * quando o servidor subiu, e a pasta some a cada publicação.
+ */
+const TIPOS_IMAGEM: Record<string, string> = {
+  ".jpg": "image/jpeg",
+  ".png": "image/png",
+  ".webp": "image/webp",
+  ".gif": "image/gif",
+};
+
+function pastaImagens() {
+  return path.join(pastaUploads(), "imagens");
+}
+
 export async function salvarImagemPublica(arquivo: File, prefixo: string): Promise<string | null> {
   if (!arquivo || arquivo.size === 0) return null;
-  if (!arquivo.type.startsWith("image/")) return null;
   if (arquivo.size > 12 * 1024 * 1024) return null;
 
-  const destino = path.resolve(process.cwd(), "public", "uploads");
-  await mkdir(destino, { recursive: true });
+  // A extensão vem do tipo, não do nome: SVG e afins ficam de fora.
+  const tipo = arquivo.type === "image/jpg" ? "image/jpeg" : arquivo.type;
+  const extensao = Object.keys(TIPOS_IMAGEM).find((ext) => TIPOS_IMAGEM[ext] === tipo);
+  if (!extensao) return null;
 
-  const extensao = path.extname(arquivo.name).toLowerCase() || ".jpg";
+  await mkdir(pastaImagens(), { recursive: true });
   const nome = `${prefixo}-${randomUUID()}${extensao}`;
-  await writeFile(path.join(destino, nome), Buffer.from(await arquivo.arrayBuffer()));
-  return `/uploads/${nome}`;
+  await writeFile(path.join(pastaImagens(), nome), Buffer.from(await arquivo.arrayBuffer()));
+  return `/imagens/${nome}`;
+}
+
+/**
+ * Lê uma imagem pública. Procura também em public/uploads, onde ficavam as
+ * enviadas antes da mudança e que ainda estejam no disco.
+ */
+export async function lerImagemPublica(nomeArquivo: string) {
+  const nome = path.basename(nomeArquivo);
+  const tipo = TIPOS_IMAGEM[path.extname(nome).toLowerCase().replace(".jpeg", ".jpg")];
+  if (!tipo) return null;
+
+  for (const pasta of [pastaImagens(), path.resolve(process.cwd(), "public", "uploads")]) {
+    try {
+      return { conteudo: await readFile(path.join(pasta, nome)), tipo };
+    } catch {
+      // Tenta a próxima pasta.
+    }
+  }
+  return null;
 }

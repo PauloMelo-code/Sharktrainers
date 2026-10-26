@@ -159,12 +159,12 @@ Projeto → **+ Service** → **App**.
 | **Build** | **Dockerfile** (o repositório já tem um) ou **Nixpacks** — os dois funcionam |
 | **Domains** | Seu domínio apontando para a porta **3000**, com HTTPS ligado |
 
-### 3. Volume para os arquivos de currículo antigos
+### 3. Volume para fotos e currículos
 
-O formulário não recebe mais anexo, então nada novo é gravado em disco. Mas os currículos
-enviados antes dessa mudança são arquivos, e some a cada publicação o que não estiver num
-volume, porque o contêiner é recriado do zero. Se o site já recebeu currículos com anexo,
-mantenha o volume. Aba **Mounts** → **Add Mount** → **Volume**:
+As fotos de vaga e capas de artigo enviadas pelo painel, e os currículos antigos com
+anexo, são arquivos. Some a cada publicação o que não estiver num volume, porque o
+contêiner é recriado do zero. Sem o volume, as fotos quebram no próximo deploy.
+Aba **Mounts** → **Add Mount** → **Volume**:
 
 | Campo | Valor |
 | --- | --- |
@@ -243,7 +243,8 @@ Duas coisas separadas:
 
 - **Banco**: use o backup do próprio serviço Postgres no Easypanel, ou pelo Console
   `pg_dump "$DATABASE_URL" > backup.sql`.
-- **Currículos**: a pasta `/app/data/uploads` do volume.
+- **Fotos e currículos**: a pasta `/app/data/uploads` do volume (as fotos ficam em
+  `imagens/`).
 
 ### Esqueceu a senha do painel?
 
